@@ -1,8 +1,10 @@
+import { Exclude } from 'class-transformer';
 import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  Index,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -12,8 +14,13 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'user_name', type: 'varchar', length: '20', unique: true })
+  @Column({ name: 'user_name', type: 'varchar', length: '20' })
+  @Index('IDX_USER_NAME', { unique: true })
   userName: string;
+
+  @Exclude()
+  @Column({ name: 'password', type: 'varchar', length: '60' })
+  password: string;
 
   @Column({ name: 'first_name', type: 'varchar', length: '20' })
   firstName: string;
@@ -22,6 +29,7 @@ export class User {
   lastName: string;
 
   @Column({ name: 'email', type: 'varchar', length: '60' })
+  @Index('IDX_USER_EMAIL', { unique: true })
   email: string;
 
   @Column({ name: 'dob', type: 'datetime' })

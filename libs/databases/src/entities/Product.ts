@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  Index,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   VersionColumn,
@@ -14,9 +15,11 @@ export class Product {
   id: number;
 
   @Column({ name: 'name', type: 'varchar', length: '60', unique: true })
+  @Index('IDX_PRODUCT_NAME', { unique: true })
   productName: string;
 
   @Column({ name: 'sku', type: 'varchar', length: '60', unique: true })
+  @Index('IDX_PRODUCT_SKU', { unique: true })
   productSKU: string;
 
   @Column({ name: 'image', type: 'varchar', length: '128' })
