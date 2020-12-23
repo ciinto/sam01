@@ -19,7 +19,8 @@
         "test:cov": "jest --coverage",
         "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
         "test:e2e": "jest --config ./apps/sam01/test/jest-e2e.json",
-        "typeorm-create-entity": "node --require ts-node/register ./node_modules/typeorm/cli.js entity:create -d libs/databases/src/entities -n"
+        "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
+        "typeorm-create-entity": "node --require ts-node/register ./node_modules/typeorm/cli.js entity:create -n"
     },
     "dependencies": {
         "@nestjs/common": "^7.6.3",
@@ -29,6 +30,8 @@
         "@nestjs/platform-fastify": "^7.6.3",
         "@nestjs/swagger": "^4.7.8",
         "@nestjs/typeorm": "^7.1.5",
+        "class-transformer": "^0.3.1",
+        "class-validator": "^0.12.2",
         "fastify-swagger": "^3.5.0",
         "mysql": "^2.18.1",
         "reflect-metadata": "^0.1.13",

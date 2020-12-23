@@ -1,37 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { MYSQL_MAIN_CONNECTION } from '@samec/databases/constants/db.constants';
+import { User } from '@samec/databases/entities/User';
 import { UserRepository } from '@samec/databases/repositories/UserRepository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
+  @InjectRepository(User, MYSQL_MAIN_CONNECTION)
+  private readonly usersRepository: UserRepository;
 
-  constructor(
-    private usersRepository: UserRepository,
-  ){}
-
-  test(userName: string){
-    return this.usersRepository.findByUserName(userName)
+  test(userName: string) {
+    return this.usersRepository.findByUserName(userName);
   }
 
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    return this.usersRepository.insert(createUserDto);
   }
 
   findAll() {
-    return `This action returns all users`;
+    return this.usersRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} user`;
+    return this.usersRepository.findOne(id);
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+    return this.usersRepository.findOne(id);
   }
 
   remove(id: number) {
-    return `This action removes a #${id} user`;
+    return this.usersRepository.softDelete(id);
   }
 }

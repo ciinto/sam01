@@ -1,5 +1,6 @@
 FROM node:12.13-alpine AS development
 
+RUN npm config set registry http://registry.npmjs.org/ --global
 RUN mkdir -p /nest
 ADD . /nest
 

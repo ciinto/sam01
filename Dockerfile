@@ -7,6 +7,7 @@ FROM node:12.13-alpine As development
 # RUN npm install -g @nestjs/cli
 # RUN npm install
 
+RUN npm config set registry http://registry.npmjs.org/ --global
 # Create app directory
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app

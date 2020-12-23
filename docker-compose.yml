@@ -44,7 +44,7 @@ services:
     ports:
       - ${PORT_WS_REST_API}:3000
       - ${PORT_DEBUG_WS_REST_API}:9229
-    environment: 
+    environment:
       - MARIADB_HOST=mariadb
 
   ws-front-end:
