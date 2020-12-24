@@ -1,20 +1,13 @@
 FROM node:12.13-alpine AS development
 
-RUN npm config set registry http://registry.npmjs.org/ --global
 RUN mkdir -p /nest
 ADD . /nest
 
 WORKDIR /nest
 
+RUN npm config set registry http://registry.npmjs.org/ --global
 RUN npm install -g @nestjs/cli
-
 RUN npm install --production=false
-
-# Build production files
-RUN nest build ws-front-end
-
-# Bundle app source
-COPY . .
 
 EXPOSE 3000
 

@@ -14,7 +14,7 @@ import entities from '../entities';
       password: 'samec@110320!',
       database: 'samec',
       entities: [...entities],
-      debug: true,
+      // debug: true,
       synchronize: true,
     }),
   ],

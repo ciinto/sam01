@@ -1,26 +1,26 @@
 version: '3.7'
 
 services:
-  main:
-    container_name: main
-    restart: always
-    build:
-      context: .
-      target: development
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-      # - ./node_modules:/usr/src/app/node_modules
-    command: npm run start:debug
-    env_file:
-      - .env
-    networks:
-      - webnet
-    depends_on:
-      - redis
-      - mariadb
-    links:
-      - mariadb:mariadb
+  # main:
+  #   container_name: main
+  #   restart: always
+  #   build:
+  #     context: .
+  #     target: development
+  #   volumes:
+  #     - .:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #     # - ./node_modules:/usr/src/app/node_modules
+  #   command: npm run start:debug
+  #   env_file:
+  #     - .env
+  #   networks:
+  #     - webnet
+  #   depends_on:
+  #     - redis
+  #     - mariadb
+  #   links:
+  #     - mariadb:mariadb
 
   ws-rest-api:
     build:
