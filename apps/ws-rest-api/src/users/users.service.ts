@@ -1,10 +1,13 @@
-import { CACHE_MANAGER, HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Cache } from 'cache-manager';
-import * as bcrypt from 'bcrypt';
 import { MYSQL_MAIN_CONNECTION } from '@samec/databases/constants/db.constants';
 import { User } from '@samec/databases/entities/User';
+import {
+  ERROR__USER__USER_EMAIL_ALREADY_EXIST,
+  ERROR__USER__USER_NAME_ALREADY_EXIST,
+} from '@samec/databases/constants/error.constants';
 import { UserRepository } from '@samec/databases/repositories/UserRepository';
+import { IPaginationOptions } from 'nestjs-typeorm-paginate';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -13,40 +16,26 @@ export class UsersService {
   @InjectRepository(User, MYSQL_MAIN_CONNECTION)
   private readonly usersRepository: UserRepository;
 
-  @Inject(CACHE_MANAGER)
-  private cacheManager: Cache;
-
-  private saltOrRounds = 10;
-
-  private cacheAllUser = 'USER_ALL';
-
-  async create(createUserDto: CreateUserDto) {
-    let createdUser;
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const { userName, email } = createUserDto;
     try {
-      createUserDto.password = await bcrypt.hash(
-        createUserDto.password,
-        this.saltOrRounds,
+      if (await this.usersRepository.findOne({ userName }))
+        throw new BadRequestException(ERROR__USER__USER_NAME_ALREADY_EXIST);
+      if (await this.usersRepository.findOne({ email }))
+        throw new BadRequestException(ERROR__USER__USER_EMAIL_ALREADY_EXIST);
+
+      return await this.usersRepository.save(
+        this.usersRepository.create(createUserDto),
       );
-
-      createdUser = await this.usersRepository.insert(createUserDto);
     } catch (e: any) {
-      console.log(e);
-
-      throw new HttpException(e.message, HttpStatus.BAD_REQUEST)
+      throw new BadRequestException(e.message);
     }
-
-    return createdUser;
   }
 
-  async findAll(): Promise<User[]> {
-    const cached = await this.cacheManager.get(this.cacheAllUser);
+  async getAllUsers(options: IPaginationOptions): Promise<User[]> {
+    // return await paginate<User>(this.usersRepository, options);
 
-    if (cached) return cached;
-
-    const users = await this.usersRepository.find();
-    await this.cacheManager.set(this.cacheAllUser, users, { ttl: 5 });
-
-    return users;
+    return await this.usersRepository.find({ cache: 60000 });
   }
 
   findOne(id: number) {

@@ -41,11 +41,13 @@ services:
       - redis
     links:
       - mariadb
+      - redis
     ports:
       - ${PORT_WS_REST_API}:3000
       - ${PORT_DEBUG_WS_REST_API}:9229
     environment:
       - MARIADB_HOST=mariadb
+      - REDIS_HOST=redis
 
   ws-front-end:
     build:
