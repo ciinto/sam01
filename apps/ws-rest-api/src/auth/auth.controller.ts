@@ -1,11 +1,26 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiHeader,
+  ApiTags,
+} from '@nestjs/swagger';
 import { User } from '@samec/databases/entities/User';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @ApiTags('auth')
+@ApiBearerAuth()
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -22,5 +37,11 @@ export class AuthController {
   })
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('jwt')
+  getProfile(@Request() req) {
+    return req.user;
   }
 }

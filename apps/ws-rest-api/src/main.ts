@@ -1,12 +1,22 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 // import * as rateLimit from 'express-rate-limit';
 import { WsRestApiModule } from './ws-rest-api.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(WsRestApiModule);
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const packageBody = require('../../../package.json');
 
+  // const app = await NestFactory.create(WsRestApiModule);
+  const app = await NestFactory.create<NestFastifyApplication>(
+    WsRestApiModule,
+    new FastifyAdapter(),
+  );
   // app.use(
   //   rateLimit({
   //     windowMs: 1 * 60 * 1000, // 1 minutes
@@ -17,15 +27,16 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const options = new DocumentBuilder()
-    .setTitle('SamEC API docs')
-    .setDescription('SamEC API docs')
-    .setVersion('1.0')
+    .setTitle(packageBody.name)
+    .setDescription(packageBody.description)
+    .setExternalDoc('Project on Github', packageBody.repository)
+    .addBearerAuth()
     .addTag('samec')
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3000);
+  await app.listen(3000, '0.0.0.0');
 }
 bootstrap();

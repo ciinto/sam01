@@ -1,4 +1,4 @@
-import { CacheModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,6 +8,7 @@ import { ProfileRepository } from '@samec/databases/repositories/ProfileReposito
 import { UserRepository } from '@samec/databases/repositories/UserRepository';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
@@ -15,17 +16,14 @@ import { AuthService } from './auth.service';
       [UserRepository, ProfileRepository],
       MYSQL_MAIN_CONNECTION,
     ),
-    CacheModule.register({
-      ttl: 5, // seconds
-      max: 10000, // maximum number of items in cache
-    }),
-    PassportModule,
     JwtModule.register({
       secret: JWT_SECRET,
-      signOptions: { expiresIn: '60s' },
+      signOptions: { expiresIn: '7d' },
     }),
+    PassportModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, JwtStrategy],
+  exports: [AuthService],
 })
 export class AuthModule {}
