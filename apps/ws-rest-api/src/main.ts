@@ -5,6 +5,7 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import * as helmet from 'helmet';
 // import * as rateLimit from 'express-rate-limit';
 import { WsRestApiModule } from './ws-rest-api.module';
 
@@ -17,6 +18,9 @@ async function bootstrap() {
     WsRestApiModule,
     new FastifyAdapter(),
   );
+
+  // app.use(helmet());
+
   // app.use(
   //   rateLimit({
   //     windowMs: 1 * 60 * 1000, // 1 minutes

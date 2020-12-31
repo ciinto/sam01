@@ -27,16 +27,16 @@ export class Product {
   @Column({ name: 'quantity', type: 'float', width: 20 })
   quantity: number;
 
-  @Column({ name: 'image', type: 'varchar', length: '128' })
+  @Column({ name: 'image', type: 'varchar', length: '128', nullable: true })
   productImage: string;
 
   @Column({ name: 'price', type: 'float', width: 20 })
   productPrice: number;
 
-  @Column({ name: 'special_price', type: 'float', width: 20 })
+  @Column({ name: 'special_price', type: 'float', width: 20, nullable: true })
   productSpecialPrice: number;
 
-  @Column({ name: 'visible', type: 'boolean' })
+  @Column({ name: 'visible', type: 'boolean', default: true })
   visible: boolean;
 
   @ManyToMany(() => Category, (category) => category.products)

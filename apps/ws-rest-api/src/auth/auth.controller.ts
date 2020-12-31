@@ -3,16 +3,10 @@ import {
   Controller,
   Get,
   Post,
-  Req,
   Request,
   UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiHeader,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { User } from '@samec/databases/entities/User';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
