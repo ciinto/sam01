@@ -1,1 +1,1 @@
-export const JWT_SECRET = 'samec@1103!'
+export const JWT_SECRET = 'samec@1103!';

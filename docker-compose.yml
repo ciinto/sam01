@@ -1,27 +1,6 @@
-version: '3.7'
+version: "3.7"
 
 services:
-  # main:
-  #   container_name: main
-  #   restart: always
-  #   build:
-  #     context: .
-  #     target: development
-  #   volumes:
-  #     - .:/usr/src/app
-  #     - /usr/src/app/node_modules
-  #     # - ./node_modules:/usr/src/app/node_modules
-  #   command: npm run start:debug
-  #   env_file:
-  #     - .env
-  #   networks:
-  #     - webnet
-  #   depends_on:
-  #     - redis
-  #     - mariadb
-  #   links:
-  #     - mariadb:mariadb
-
   ws-rest-api:
     build:
       context: .
@@ -32,7 +11,7 @@ services:
     # image: "ws-rest-api:latest"
     restart: always
     networks:
-      - webnet
+      - samsam
     volumes:
       - .:/nest
       - /nest/node_modules
@@ -42,6 +21,7 @@ services:
     links:
       - mariadb
       - redis
+      - zeebe-broker
     ports:
       - ${PORT_WS_REST_API}:3000
       - ${PORT_DEBUG_WS_REST_API}:9229
@@ -59,29 +39,63 @@ services:
     # image: "ws-front-end:latest"
     restart: always
     networks:
-      - webnet
+      - samsam
     volumes:
       - .:/nest
       - /nest/node_modules
     depends_on:
       - mariadb
       - redis
+      - zeebe-broker
     ports:
       - ${PORT_WS_FRONT_END}:3000
       - ${PORT_DEBUG_WS_FRONT_END}:9229
+
+  ws-upload-api:
+    build:
+      context: .
+      dockerfile: apps/ws-upload-api/Dockerfile
+      target: development
+      args:
+        NODE_ENV: development
+    # image: "ws-upload-api:latest"
+    restart: always
+    networks:
+      - samsam
+    volumes:
+      - .:/nest
+      - /nest/node_modules
+    depends_on:
+      - mariadb
+      - redis
+      - zeebe-broker
+    links:
+      - mariadb
+      - redis
+      - zeebe-broker:zeebe-broker
+    ports:
+      - ${PORT_WS_UPLOAD_API}:3000
+      - ${PORT_DEBUG_WS_UPLOAD_API}:9229
+    environment:
+      - ZEEBE_NODE_PUREJS=true
+      - NO_PROXY=zeebe-broker
+      - no_proxy=zeebe-broker
+      - MARIADB_HOST=mariadb
+      - REDIS_HOST=redis
+      - ZEEBE_HOST=zeebe-broker
 
   redis:
     container_name: redis
     restart: always
     image: redis:5
     networks:
-      - webnet
+      - samsam
 
   mariadb:
     image: mariadb
     restart: always
     networks:
-      - webnet
+      - samsam
     environment:
       MYSQL_ROOT_PASSWORD: example
       MYSQL_DATABASE: ${DB_DATABASE_NAME}
@@ -98,8 +112,67 @@ services:
     ports:
       - 8080:8080
 
+  zeebe-broker:
+    container_name: zeebe-broker
+    image: camunda/zeebe:0.25.1
+    restart: always
+    environment:
+      - ZEEBE_LOG_LEVEL=debug
+    ports:
+      - "26500:26500"
+      - "9600:9600"
+      - "5701:5701"
+    volumes:
+      - ./zeebe/zeebe-hazelcast-exporter.jar:/usr/local/zeebe/exporters/zeebe-hazelcast-exporter.jar
+      - ./zeebe/zeebe-application.yaml:/usr/local/zeebe/config/application.yaml
+      - zeebe_data:/usr/local/zeebe/data
+    networks:
+      - samsam
+
+  zeebe-monitor:
+    container_name: zeebe_monitor
+    restart: always
+    image: camunda/zeebe-simple-monitor:0.19.0
+    environment:
+      - zeebe.client.broker.contactPoint=zeebe-broker:26500
+      - zeebe.client.worker.hazelcast.connection=zeebe-broker:5701
+    ports:
+      - "12091:8082"
+    depends_on:
+      - zeebe-broker
+    networks:
+      - samsam
+
+  zeebe-operate:
+    container_name: zeebe-operate
+    image: camunda/operate:0.25.0
+    restart: always
+    ports:
+      - "12090:8080"
+    volumes:
+      - ./zeebe/operate-application.yml:/usr/local/operate/config/application.yml
+    networks:
+      - samsam
+
+  zeebe-elasticsearch:
+    container_name: zeebe-elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.7.1
+    restart: always
+    ports:
+      - "12092:9200"
+    environment:
+      - discovery.type=single-node
+      - cluster.name=zeebe-elasticsearch
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - zeebe_elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - samsam
+
 networks:
-  webnet:
+  samsam:
 
 volumes:
   dbdata:
+  zeebe_data:
+  zeebe_elasticsearch_data:

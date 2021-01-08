@@ -16,10 +16,10 @@ export class Category {
   id: number;
 
   @Column()
-  title: string;
+  name: string;
 
   @Column()
-  text: string;
+  description: string;
 
   @ManyToOne(() => Category, (category) => category.childCategories)
   parentCategory: Category;

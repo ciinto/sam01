@@ -43,6 +43,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/databases/tsconfig.lib.json"
       }
+    },
+    "ws-upload-api": {
+      "type": "application",
+      "root": "apps/ws-upload-api",
+      "entryFile": "main",
+      "sourceRoot": "apps/ws-upload-api/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/ws-upload-api/tsconfig.app.json"
+      }
     }
   }
 }
